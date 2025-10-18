@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .field-config {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f9fafb;
+        }
+        .field-config:hover {
+            border-color: #be1e2d;
+            box-shadow: 0 2px 8px rgba(190, 30, 45, 0.1);
+        }
+        .section-header {
+            background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(190, 30, 45, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .template-card {
+            border: 3px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .template-card:hover {
+            border-color: #be1e2d;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        .template-card.selected {
+            border-color: #be1e2d;
+            background: #fef2f2;
+            box-shadow: 0 4px 16px rgba(190, 30, 45, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Form Generator</h1>
+            <p class="text-gray-600">Create customized forms based on standard templates</p>
+        </div>
+
+        <!-- Step 1: Template Selection -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Step 1: Select Template Type</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="template-card" data-template="simple" onclick="selectTemplate('simple')">
+                    <div class="text-center">
+                        <svg class="w-16 h-16 mx-auto mb-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2">Simple Form</h3>
+                        <p class="text-sm text-gray-600">Single section with all fields visible</p>
+                    </div>
+                </div>
+                <div class="template-card" data-template="accordion" onclick="selectTemplate('accordion')">
+                    <div class="text-center">
+                        <svg class="w-16 h-16 mx-auto mb-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2">Accordion Form</h3>
+                        <p class="text-sm text-gray-600">Collapsible sections for organized fields</p>
+                    </div>
+                </div>
+                <div class="template-card" data-template="stepper" onclick="selectTemplate('stepper')">
+                    <div class="text-center">
+                        <svg class="w-16 h-16 mx-auto mb-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold mb-2">Stepper Form</h3>
+                        <p class="text-sm text-gray-600">Multi-step form with navigation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Configuration Area (Dynamic) -->
+        <div id="configArea" class="hidden">
+            <!-- Configuration will be loaded dynamically based on template selection -->
+        </div>
+
+        <!-- Step 3: Action Buttons -->
+        <div id="actionButtons" class="hidden bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex gap-4 justify-center">
+                <button onclick="generateForm()" class="btn-primary">Generate Form</button>
+                <button onclick="downloadForm()" id="downloadBtn" class="btn-secondary hidden">Download Form</button>
+                <button onclick="previewForm()" id="previewBtn" class="btn-secondary hidden">Preview in New Tab</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTemplate = null;
+        let generatedHTML = null;
+        let formConfig = {
+            template: null,
+            fields: [],
+            accordions: [],
+            steps: []
+        };
+
+        // Template Selection
+        function selectTemplate(template) {
+            selectedTemplate = template;
+            
+            // Update UI
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-template="${template}"]`).classList.add('selected');
+            
+            // Show configuration area
+            loadConfiguration(template);
+            document.getElementById('actionButtons').classList.remove('hidden');
+        }
+
+        // Load Configuration UI based on template
+        function loadConfiguration(template) {
+            const configArea = document.getElementById('configArea');
+            formConfig.template = template;
+            
+            if (template === 'simple') {
+                configArea.innerHTML = generateSimpleFormConfig();
+                // Initialize fields after a brief delay to ensure DOM is ready
+                setTimeout(() => updateSimpleFormFields(), 50);
+            } else if (template === 'accordion') {
+                configArea.innerHTML = generateAccordionFormConfig();
+                // Initialize accordions after a brief delay
+                setTimeout(() => updateAccordionConfig(), 50);
+            } else if (template === 'stepper') {
+                configArea.innerHTML = generateStepperFormConfig();
+                // Initialize steps after a brief delay
+                setTimeout(() => updateStepperConfig(), 50);
+            }
+            
+            configArea.classList.remove('hidden');
+        }
+
+        // Simple Form Configuration UI
+        function generateSimpleFormConfig() {
+            return `
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Step 2: Configure Simple Form</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Number of Fields (1-50)</label>
+                        <input type="number" id="numFields" min="1" max="50" value="5" 
+                            class="border-2 border-gray-300 rounded px-3 py-2 w-32"
+                            onchange="updateSimpleFormFields()">
+                    </div>
+                    
+                    <div id="fieldsContainer" class="mt-6">
+                        <!-- Fields will be generated here -->
+                    </div>
+                </div>
+            `;
+        }
+
+        // Accordion Form Configuration UI
+        function generateAccordionFormConfig() {
+            return `
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Step 2: Configure Accordion Form</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Number of Accordions (1-10)</label>
+                        <input type="number" id="numAccordions" min="1" max="10" value="2" 
+                            class="border-2 border-gray-300 rounded px-3 py-2 w-32"
+                            onchange="updateAccordionConfig()">
+                    </div>
+                    
+                    <div id="accordionsContainer" class="mt-6">
+                        <!-- Accordions will be generated here -->
+                    </div>
+                </div>
+            `;
+        }
+
+        // Stepper Form Configuration UI
+        function generateStepperFormConfig() {
+            return `
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Step 2: Configure Stepper Form</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Number of Steps (2-10)</label>
+                        <input type="number" id="numSteps" min="2" max="10" value="3" 
+                            class="border-2 border-gray-300 rounded px-3 py-2 w-32"
+                            onchange="updateStepperConfig()">
+                    </div>
+                    
+                    <div id="stepsContainer" class="mt-6">
+                        <!-- Steps will be generated here -->
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update Simple Form Fields
+        function updateSimpleFormFields() {
+            const numFields = parseInt(document.getElementById('numFields').value);
+            const container = document.getElementById('fieldsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < numFields; i++) {
+                container.innerHTML += generateFieldConfig(i, 'simple');
+            }
+        }
+
+        // Update Accordion Configuration
+        function updateAccordionConfig() {
+            const numAccordions = parseInt(document.getElementById('numAccordions').value);
+            const container = document.getElementById('accordionsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < numAccordions; i++) {
+                container.innerHTML += `
+                    <div class="mb-6 border-2 border-gray-300 rounded-lg p-4">
+                        <div class="section-header">Accordion ${i + 1}</div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Accordion Title</label>
+                            <input type="text" id="accordion_${i}_title" value="Section ${i + 1}" 
+                                class="border-2 border-gray-300 rounded px-3 py-2 w-full">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Number of Fields (1-20)</label>
+                            <input type="number" id="accordion_${i}_numFields" min="1" max="20" value="3" 
+                                class="border-2 border-gray-300 rounded px-3 py-2 w-32"
+                                onchange="updateAccordionFields(${i})">
+                        </div>
+                        
+                        <div id="accordion_${i}_fields" class="mt-4">
+                            <!-- Fields will be generated here -->
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Initialize fields for each accordion
+            for (let i = 0; i < numAccordions; i++) {
+                updateAccordionFields(i);
+            }
+        }
+
+        // Update Accordion Fields
+        function updateAccordionFields(accordionIndex) {
+            const numFields = parseInt(document.getElementById(`accordion_${accordionIndex}_numFields`).value);
+            const container = document.getElementById(`accordion_${accordionIndex}_fields`);
+            container.innerHTML = '';
+            
+            for (let i = 0; i < numFields; i++) {
+                container.innerHTML += generateFieldConfig(i, `accordion_${accordionIndex}`);
+            }
+        }
+
+        // Update Stepper Configuration
+        function updateStepperConfig() {
+            const numSteps = parseInt(document.getElementById('numSteps').value);
+            const container = document.getElementById('stepsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < numSteps; i++) {
+                container.innerHTML += `
+                    <div class="mb-6 border-2 border-gray-300 rounded-lg p-4">
+                        <div class="section-header">Step ${i + 1}</div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Step Label</label>
+                            <input type="text" id="step_${i}_label" value="Step ${i + 1}" 
+                                class="border-2 border-gray-300 rounded px-3 py-2 w-full">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Number of Fields (1-20)</label>
+                            <input type="number" id="step_${i}_numFields" min="1" max="20" value="3" 
+                                class="border-2 border-gray-300 rounded px-3 py-2 w-32"
+                                onchange="updateStepFields(${i})">
+                        </div>
+                        
+                        <div id="step_${i}_fields" class="mt-4">
+                            <!-- Fields will be generated here -->
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Initialize fields for each step
+            for (let i = 0; i < numSteps; i++) {
+                updateStepFields(i);
+            }
+        }
+
+        // Update Step Fields
+        function updateStepFields(stepIndex) {
+            const numFields = parseInt(document.getElementById(`step_${stepIndex}_numFields`).value);
+            const container = document.getElementById(`step_${stepIndex}_fields`);
+            container.innerHTML = '';
+            
+            for (let i = 0; i < numFields; i++) {
+                container.innerHTML += generateFieldConfig(i, `step_${stepIndex}`);
+            }
+        }
+
+        // Generate Field Configuration UI
+        function generateFieldConfig(index, prefix) {
+            const fieldId = `${prefix}_field_${index}`;
+            return `
+                <div class="field-config">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-semibold text-gray-700">Field ${index + 1}</h4>
+                        <button onclick="removeField('${fieldId}')" class="btn-danger text-xs">Remove</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Label*</label>
+                            <input type="text" id="${fieldId}_label" 
+                                placeholder="e.g., Full Name" 
+                                class="border border-gray-300 rounded px-2 py-1 w-full text-sm"
+                                onchange="autoGenerateFieldName('${fieldId}')">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Field Name*</label>
+                            <input type="text" id="${fieldId}_name" 
+                                placeholder="e.g., full_name" 
+                                class="border border-gray-300 rounded px-2 py-1 w-full text-sm">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Field Type*</label>
+                            <select id="${fieldId}_type" 
+                                class="border border-gray-300 rounded px-2 py-1 w-full text-sm"
+                                onchange="handleFieldTypeChange('${fieldId}')">
+                                <option value="text">Text</option>
+                                <option value="email">Email</option>
+                                <option value="tel">Phone</option>
+                                <option value="password">Password</option>
+                                <option value="number">Number</option>
+                                <option value="date">Date</option>
+                                <option value="select">Select Dropdown</option>
+                                <option value="radio">Radio Buttons</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="textarea">Textarea</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">
+                                <input type="checkbox" id="${fieldId}_required" class="mr-1">
+                                Required Field
+                            </label>
+                            <input type="text" id="${fieldId}_placeholder" 
+                                placeholder="Placeholder text (optional)" 
+                                class="border border-gray-300 rounded px-2 py-1 w-full text-sm mt-1">
+                        </div>
+                    </div>
+                    
+                    <div id="${fieldId}_options" class="mt-3 hidden">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Options (comma-separated)*</label>
+                        <textarea id="${fieldId}_optionsList" 
+                            placeholder="e.g., Option 1, Option 2, Option 3" 
+                            class="border border-gray-300 rounded px-2 py-1 w-full text-sm"
+                            rows="2"></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Auto-generate field name from label
+        function autoGenerateFieldName(fieldId) {
+            const label = document.getElementById(`${fieldId}_label`).value;
+            const fieldName = label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            document.getElementById(`${fieldId}_name`).value = fieldName;
+        }
+
+        // Handle field type change
+        function handleFieldTypeChange(fieldId) {
+            const type = document.getElementById(`${fieldId}_type`).value;
+            const optionsDiv = document.getElementById(`${fieldId}_options`);
+            
+            if (type === 'select' || type === 'radio' || type === 'checkbox') {
+                optionsDiv.classList.remove('hidden');
+            } else {
+                optionsDiv.classList.add('hidden');
+            }
+        }
+
+        // Remove field
+        function removeField(fieldId) {
+            const fieldElement = document.getElementById(fieldId).closest('.field-config');
+            if (fieldElement) {
+                fieldElement.remove();
+            }
+        }
+
+        // Don't initialize anything on load - wait for user to select template
+
+        // ==================== FORM GENERATION ====================
+        
+        // Collect configuration from UI
+        function collectConfiguration() {
+            if (selectedTemplate === 'simple') {
+                return collectSimpleFormConfig();
+            } else if (selectedTemplate === 'accordion') {
+                return collectAccordionFormConfig();
+            } else if (selectedTemplate === 'stepper') {
+                return collectStepperFormConfig();
+            }
+        }
+
+        // Collect Simple Form Configuration
+        function collectSimpleFormConfig() {
+            const fields = [];
+            const container = document.getElementById('fieldsContainer');
+            const fieldConfigs = container.querySelectorAll('.field-config');
+            
+            fieldConfigs.forEach((fieldDiv, index) => {
+                const fieldId = `simple_field_${index}`;
+                const label = document.getElementById(`${fieldId}_label`)?.value || '';
+                const name = document.getElementById(`${fieldId}_name`)?.value || '';
+                const type = document.getElementById(`${fieldId}_type`)?.value || 'text';
+                const required = document.getElementById(`${fieldId}_required`)?.checked || false;
+                const placeholder = document.getElementById(`${fieldId}_placeholder`)?.value || '';
+                const optionsList = document.getElementById(`${fieldId}_optionsList`)?.value || '';
+                
+                if (label && name) {
+                    fields.push({
+                        label,
+                        name,
+                        type,
+                        required,
+                        placeholder,
+                        options: optionsList.split(',').map(o => o.trim()).filter(o => o)
+                    });
+                }
+            });
+            
+            return { template: 'simple', fields };
+        }
+
+        // Collect Accordion Form Configuration
+        function collectAccordionFormConfig() {
+            const numAccordions = parseInt(document.getElementById('numAccordions').value);
+            const accordions = [];
+            
+            for (let i = 0; i < numAccordions; i++) {
+                const title = document.getElementById(`accordion_${i}_title`)?.value || `Section ${i + 1}`;
+                const fields = [];
+                const container = document.getElementById(`accordion_${i}_fields`);
+                const fieldConfigs = container.querySelectorAll('.field-config');
+                
+                fieldConfigs.forEach((fieldDiv, fieldIndex) => {
+                    const fieldId = `accordion_${i}_field_${fieldIndex}`;
+                    const label = document.getElementById(`${fieldId}_label`)?.value || '';
+                    const name = document.getElementById(`${fieldId}_name`)?.value || '';
+                    const type = document.getElementById(`${fieldId}_type`)?.value || 'text';
+                    const required = document.getElementById(`${fieldId}_required`)?.checked || false;
+                    const placeholder = document.getElementById(`${fieldId}_placeholder`)?.value || '';
+                    const optionsList = document.getElementById(`${fieldId}_optionsList`)?.value || '';
+                    
+                    if (label && name) {
+                        fields.push({
+                            label,
+                            name,
+                            type,
+                            required,
+                            placeholder,
+                            options: optionsList.split(',').map(o => o.trim()).filter(o => o)
+                        });
+                    }
+                });
+                
+                accordions.push({ title, fields });
+            }
+            
+            return { template: 'accordion', accordions };
+        }
+
+        // Collect Stepper Form Configuration
+        function collectStepperFormConfig() {
+            const numSteps = parseInt(document.getElementById('numSteps').value);
+            const steps = [];
+            
+            for (let i = 0; i < numSteps; i++) {
+                const label = document.getElementById(`step_${i}_label`)?.value || `Step ${i + 1}`;
+                const fields = [];
+                const container = document.getElementById(`step_${i}_fields`);
+                const fieldConfigs = container.querySelectorAll('.field-config');
+                
+                fieldConfigs.forEach((fieldDiv, fieldIndex) => {
+                    const fieldId = `step_${i}_field_${fieldIndex}`;
+                    const fieldLabel = document.getElementById(`${fieldId}_label`)?.value || '';
+                    const name = document.getElementById(`${fieldId}_name`)?.value || '';
+                    const type = document.getElementById(`${fieldId}_type`)?.value || 'text';
+                    const required = document.getElementById(`${fieldId}_required`)?.checked || false;
+                    const placeholder = document.getElementById(`${fieldId}_placeholder`)?.value || '';
+                    const optionsList = document.getElementById(`${fieldId}_optionsList`)?.value || '';
+                    
+                    if (fieldLabel && name) {
+                        fields.push({
+                            label: fieldLabel,
+                            name,
+                            type,
+                            required,
+                            placeholder,
+                            options: optionsList.split(',').map(o => o.trim()).filter(o => o)
+                        });
+                    }
+                });
+                
+                steps.push({ label, fields });
+            }
+            
+            return { template: 'stepper', steps };
+        }
+
+        // Generate Form
+        function generateForm() {
+            const config = collectConfiguration();
+            
+            // Validation
+            if (!config) {
+                alert('Please configure your form first!');
+                return;
+            }
+            
+            if (config.template === 'simple' && config.fields.length === 0) {
+                alert('Please add at least one field!');
+                return;
+            }
+            
+            if (config.template === 'accordion' && config.accordions.length === 0) {
+                alert('Please add at least one accordion!');
+                return;
+            }
+            
+            if (config.template === 'stepper' && config.steps.length === 0) {
+                alert('Please add at least one step!');
+                return;
+            }
+            
+            // Generate HTML based on template
+            if (config.template === 'simple') {
+                generatedHTML = buildSimpleForm(config);
+            } else if (config.template === 'accordion') {
+                generatedHTML = buildAccordionForm(config);
+            } else if (config.template === 'stepper') {
+                generatedHTML = buildStepperForm(config);
+            }
+            
+            // Show download and preview buttons
+            document.getElementById('downloadBtn').classList.remove('hidden');
+            document.getElementById('previewBtn').classList.remove('hidden');
+            
+            alert('Form generated successfully! You can now download or preview it.');
+        }
+
+        // Download Form
+        function downloadForm() {
+            if (!generatedHTML) {
+                alert('Please generate the form first!');
+                return;
+            }
+            
+            const blob = new Blob([generatedHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${selectedTemplate}-form-generated.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Preview Form
+        function previewForm() {
+            if (!generatedHTML) {
+                alert('Please generate the form first!');
+                return;
+            }
+            
+            const newWindow = window.open();
+            newWindow.document.write(generatedHTML);
+            newWindow.document.close();
+        }
+
+        // ==================== FORM BUILDERS ====================
+        
+        // Helper: Generate Field HTML
+        function generateFieldHTML(field) {
+            const requiredAttr = field.required ? 'required' : '';
+            const placeholderAttr = field.placeholder ? `placeholder="${field.placeholder}"` : '';
+            
+            let fieldHTML = '';
+            
+            switch(field.type) {
+                case 'text':
+                case 'email':
+                case 'tel':
+                case 'password':
+                case 'number':
+                case 'date':
+                    fieldHTML = `
+                        <div class="form-field-container">
+                            <label>${field.label}${field.required ? '*' : ''}</label>
+                            <input type="${field.type}" name="${field.name}" ${requiredAttr} ${placeholderAttr}>
+                        </div>`;
+                    break;
+                    
+                case 'textarea':
+                    fieldHTML = `
+                        <div class="form-field-container col-span-5">
+                            <label>${field.label}${field.required ? '*' : ''}</label>
+                            <textarea name="${field.name}" rows="2" ${requiredAttr} ${placeholderAttr}></textarea>
+                        </div>`;
+                    break;
+                    
+                case 'select':
+                    const options = field.options.map(opt => `<option>${opt}</option>`).join('');
+                    fieldHTML = `
+                        <div class="form-field-container">
+                            <label>${field.label}${field.required ? '*' : ''}</label>
+                            <select name="${field.name}" ${requiredAttr}>
+                                <option>Select ${field.label}</option>
+                                ${options}
+                            </select>
+                        </div>`;
+                    break;
+                    
+                case 'radio':
+                    const radioOptions = field.options.map((opt, idx) => `
+                        <label class="flex items-center">
+                            <input type="radio" name="${field.name}" value="${opt}" ${idx === 0 ? 'checked' : ''} class="mr-1">
+                            <span class="text-xs">${opt}</span>
+                        </label>
+                    `).join('');
+                    fieldHTML = `
+                        <div class="form-field-container">
+                            <label>${field.label}${field.required ? '*' : ''}</label>
+                            <div class="flex items-center space-x-2 mt-2">
+                                ${radioOptions}
+                            </div>
+                        </div>`;
+                    break;
+                    
+                case 'checkbox':
+                    fieldHTML = `
+                        <div class="form-field-container">
+                            <label class="flex items-center mt-6" style="white-space: nowrap; min-width: 0;">
+                                <input type="checkbox" name="${field.name}" ${field.required ? 'checked' : ''} class="mr-1" style="flex-shrink: 0;">
+                                <span class="text-xs">${field.label}</span>
+                            </label>
+                        </div>`;
+                    break;
+            }
+            
+            return fieldHTML;
+        }
+
+        // Build Simple Form
+        function buildSimpleForm(config) {
+            const fieldsHTML = config.fields.map(field => generateFieldHTML(field)).join('\\n');
+            const cssContent = getSharedCSS();
+            const jsContent = getSimpleFormJS(config);
+            
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Simple Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Injected CSS */
+${cssContent.replace(/`/g, '\\`')}
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="flex flex-col min-h-screen">
+        <div class="main-content-wrapper">
+            <div class="main-content-area bg-gray-50 p-6" style="width: 100%;">
+                <div class="max-w-full mx-auto">
+                    <div class="form-container">
+                        <div id="formSection" class="form-section bg-white rounded-lg shadow-sm p-2 overflow-hidden compact-form">
+                            <div class="grid grid-cols-5 gap-2 mb-3">
+                                ${fieldsHTML}
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-primary" id="previewBtn">Preview</button>
+                                <button class="action-btn action-btn-success" id="submitBtn">Submit</button>
+                                <button class="action-btn action-btn-warning" id="clearBtn">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="previewSection" class="preview-section hidden bg-white rounded-lg shadow-sm p-2 overflow-hidden">
+                            <div class="flex justify-between items-center mb-2 border-b border-gray-200 pb-1">
+                                <h3 class="text-base font-semibold text-gray-800">Form Data Preview</h3>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded" onclick="closePreview()" title="Close Preview">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="previewContent" class="bg-gray-100 p-4 rounded text-xs overflow-y-auto" style="height: calc(100vh - 350px); min-height: 400px;">
+                                <div class="text-center text-gray-600">Form preview will appear here...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+${jsContent}
+    <\/script>
+</body>
+</html>`;
+        }
+
+        // Get Shared CSS
+        function getSharedCSS() {
+            return `:root{
+  --headerH: 0px;
+  --footerH: 60px;
+  --sidebarW: 280px;
+}
+
+header, nav { position: relative; z-index: 1100; }
+
+.main-content-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content-area {
+  flex: 1;
+  background: #e7e8e9;
+  padding: 20px;
+}
+
+.form-container {
+  display: flex;
+  gap: 0.5rem;
+  height: auto;
+  padding: 0.25rem;
+  overflow: visible;
+}
+
+.form-section {
+  flex: 1;
+  transition: width 0.3s ease;
+  overflow: visible;
+  height: auto;
+  max-height: none;
+}
+
+.form-section.compact {
+  width: 50%;
+  flex: 0 0 50%;
+}
+
+.preview-section {
+  width: 50%;
+  flex: 0 0 50%;
+  transition: all 0.3s ease;
+  overflow: visible;
+  height: auto;
+  max-height: none;
+}
+
+.preview-section.hidden {
+  display: none;
+}
+
+.form-input {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.compact-form .mb-6 {
+  margin-bottom: 1rem;
+}
+
+.compact-form .mb-4 {
+  margin-bottom: 0.75rem;
+}
+
+.compact-form .mb-3 {
+  margin-bottom: 0.5rem;
+}
+
+.compact-form .mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.compact-form .gap-4 {
+  gap: 0.75rem;
+}
+
+.compact-form .gap-3 {
+  gap: 0.5rem;
+}
+
+.compact-form .gap-2 {
+  gap: 0.5rem;
+}
+
+.compact-form .p-3 {
+  padding: 0.75rem;
+}
+
+.compact-form .p-4 {
+  padding: 1rem;
+}
+
+.form-field-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.form-field-container label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.125rem;
+  letter-spacing: 0.025em;
+  transition: color 0.2s ease;
+  line-height: 1.2;
+}
+
+.form-field-container input,
+.form-field-container select,
+.form-field-container textarea {
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  color: #374151;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-field-container input:hover,
+.form-field-container select:hover,
+.form-field-container textarea:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.form-field-container input:focus,
+.form-field-container select:focus,
+.form-field-container textarea:focus {
+  outline: none;
+  border-color: #be1e2d;
+  box-shadow: 0 0 0 4px rgba(190, 30, 45, 0.15);
+  transform: translateY(-1px);
+}
+
+.form-field-container input::placeholder,
+.form-field-container textarea::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.action-buttons {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  border-radius: 0 0 1rem 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  width: 100px;
+  text-align: center;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.action-btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.action-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.action-btn-secondary {
+  background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%);
+  color: white;
+  border-color: #be1e2d;
+  box-shadow: 0 4px 15px rgba(190, 30, 45, 0.3);
+}
+
+.action-btn-secondary:hover {
+  background: linear-gradient(135deg, #9e1825 0%, #7e141e 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(190, 30, 45, 0.4);
+}
+
+.action-btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.action-btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.action-btn-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.action-btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+#previewContent {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  min-height: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+#previewContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #be1e2d 0%, #ea580c 50%, #be1e2d 100%);
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.preview-section:not(.hidden) {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+}
+
+.preview-section:not(.hidden) > div:first-child {
+  flex-shrink: 0;
+}
+
+.preview-section:not(.hidden) #previewContent {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.compact-form {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
+  overflow: visible;
+}
+
+.compact-form input,
+.compact-form select,
+.compact-form textarea {
+  width: 100%;
+  max-width: 200px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.compact-form textarea {
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+}
+
+.grid-cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.col-span-5 {
+  grid-column: span 5 / span 5;
+}
+
+.col-span-3 {
+  grid-column: span 3 / span 3;
+}
+
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
+@media (max-width: 1200px) {
+  .compact-form .grid-cols-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .compact-form .grid-cols-5,
+  .compact-form .grid-cols-3,
+  .compact-form .grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+}`;
+        }
+
+        // Get Simple Form JavaScript
+        function getSimpleFormJS(config) {
+            const fieldNames = config.fields.map(f => f.name);
+            const previewFields = config.fields.map(f => {
+                return `<div><strong>${f.label}:</strong> <span id="preview-${f.name}" class="text-gray-600">\${formData.${f.name} || 'Not provided'}</span></div>`;
+            }).join('\\n                            ');
+            
+            const updatePreviewFields = config.fields.map(f => 
+                `updatePreviewField('preview-${f.name}', formData.${f.name});`
+            ).join('\\n                ');
+            
+            return `const previewBtn = document.getElementById('previewBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const formSection = document.getElementById('formSection');
+        const previewSection = document.getElementById('previewSection');
+
+        function captureFormData() {
+            const formData = {};
+            const inputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.checked) {
+                        formData[input.name] = input.value;
+                    }
+                } else if (input.type === 'checkbox') {
+                    formData[input.name] = input.checked ? 'Yes' : 'No';
+                } else {
+                    formData[input.name] = input.value || '';
+                }
+            });
+            return formData;
+        }
+
+        function displayFormPreview(formData) {
+            const previewContent = document.getElementById('previewContent');
+            if (!previewContent) return;
+            
+            previewContent.innerHTML = \\\`
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2 text-sm">Form Data Preview</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        ${previewFields}
+                    </div>
+                </div>
+            \\\`;
+        }
+
+        function showPreviewSection() {
+            if (previewSection && formSection) {
+                previewSection.classList.remove('hidden');
+                formSection.classList.add('compact');
+            }
+        }
+
+        function updatePreviewField(fieldId, value) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.textContent = value || 'Not provided';
+            }
+        }
+
+        function updateLivePreview() {
+            const previewSection = document.getElementById('previewSection');
+            if (previewSection.classList.contains('hidden')) return;
+            
+            const formData = captureFormData();
+            ${updatePreviewFields}
+        }
+
+        function clearForm() {
+            const allInputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            allInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.getAttribute('checked') !== null) {
+                        input.checked = true;
+                    } else {
+                        input.checked = false;
+                    }
+                } else if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else if (input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || input.type === 'password' || input.type === 'date') {
+                    input.value = '';
+                } else if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else if (input.tagName === 'TEXTAREA') {
+                    input.value = '';
+                }
+            });
+            updateLivePreview();
+            alert('Form cleared successfully!');
+        }
+
+        function closePreview() {
+            if (previewSection) {
+                previewSection.classList.add('hidden');
+            }
+            if (formSection) {
+                formSection.classList.remove('compact');
+            }
+        }
+
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formData = captureFormData();
+                displayFormPreview(formData);
+                showPreviewSection();
+                updateLivePreview();
+            });
+        }
+
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formData = captureFormData();
+                alert('Form submitted successfully!\\\\n\\\\nData:\\\\n' + JSON.stringify(formData, null, 2));
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearForm();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const allFormInputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            allFormInputs.forEach(input => {
+                input.addEventListener('input', updateLivePreview);
+                input.addEventListener('change', updateLivePreview);
+            });
+        });`;
+        }
+
+        // Build Accordion Form
+        function buildAccordionForm(config) {
+            let accordionsHTML = '';
+            
+            config.accordions.forEach((accordion, accIndex) => {
+                const fieldsHTML = accordion.fields.map(field => generateFieldHTML(field)).join('\\n                                                ');
+                
+                accordionsHTML += `
+                    <div class="accordion-section" data-section="accordion_${accIndex}">
+                        <div class="accordion-header" onclick="toggleAccordion('accordion_${accIndex}')">
+                            <h3>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                ${accordion.title}
+                            </h3>
+                            <button class="accordion-toggle" type="button">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="accordion-content ${accIndex === 0 ? 'expanded' : 'collapsed'}" id="accordion_${accIndex}_content">
+                            <div class="grid grid-cols-5 gap-2">
+                                ${fieldsHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            const cssContent = getSharedCSS() + getAccordionCSS();
+            const jsContent = getAccordionFormJS(config);
+            
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Accordion Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+${cssContent.replace(/`/g, '\\`')}
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="flex flex-col min-h-screen">
+        <div class="main-content-wrapper">
+            <div class="main-content-area bg-gray-50 p-6" style="width: 100%;">
+                <div class="max-w-full mx-auto">
+                    <div class="form-container">
+                        <div id="formSection" class="form-section bg-white rounded-lg shadow-sm p-2 overflow-hidden compact-form">
+                            ${accordionsHTML}
+                            
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-primary" id="previewBtn">Preview</button>
+                                <button class="action-btn action-btn-success" id="submitBtn">Submit</button>
+                                <button class="action-btn action-btn-secondary" id="cancelBtn">Cancel</button>
+                                <button class="action-btn action-btn-warning flex items-center" id="clearBtn">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="previewSection" class="preview-section hidden bg-white rounded-lg shadow-sm p-2 overflow-hidden">
+                            <div class="flex justify-between items-center mb-2 border-b border-gray-200 pb-1">
+                                <h3 class="text-base font-semibold text-gray-800">Form Data Preview</h3>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded" onclick="closePreview()" title="Close Preview">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="fileContent" class="bg-gray-100 p-4 rounded text-xs overflow-y-auto" style="height: calc(100vh - 450px); min-height: 500px;">
+                                <div class="text-center text-gray-600">Loading file preview...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+${jsContent}
+    </script>
+</body>
+</html>`;
+        }
+
+        // Get Accordion CSS
+        function getAccordionCSS() {
+            return `
+.accordion-section {
+  margin-bottom: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.accordion-section:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.accordion-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.accordion-header:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.accordion-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.accordion-header h3::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(135deg, #be1e2d 0%, #9e1825 100%);
+  border-radius: 0.25rem;
+}
+
+.accordion-toggle {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.accordion-toggle:hover {
+  background: #e2e8f0;
+  color: #374151;
+  transform: scale(1.1);
+}
+
+.accordion-toggle.active {
+  transform: rotate(180deg);
+  color: #be1e2d;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+}
+
+.accordion-content.expanded {
+  max-height: 2000px;
+  padding: 0.5rem;
+}
+
+.accordion-content.collapsed {
+  max-height: 0;
+  padding: 0 0.5rem;
+}`;
+        }
+
+        // Get Accordion Form JavaScript
+        function getAccordionFormJS(config) {
+            // Collect all fields from all accordions
+            const allFields = [];
+            config.accordions.forEach(acc => {
+                allFields.push(...acc.fields);
+            });
+            
+            const previewSections = config.accordions.map((acc, idx) => {
+                const sectionFields = acc.fields.map(f => 
+                    `<div><strong>${f.label}:</strong> <span id="preview-${f.name}" class="text-gray-600">\${formData.${f.name} || 'Not provided'}</span></div>`
+                ).join('\\n                                ');
+                
+                return `<div class="mb-4${idx > 0 ? ' border-t pt-4' : ''}">
+                        <h4 class="font-semibold text-gray-800 mb-2 text-sm">${acc.title}</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            ${sectionFields}
+                        </div>
+                    </div>`;
+            }).join('\\n                    ');
+            
+            const updatePreviewFields = allFields.map(f => 
+                `updatePreviewField('preview-${f.name}', formData.${f.name});`
+            ).join('\\n                ');
+            
+            return `const previewBtn = document.getElementById('previewBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const formSection = document.getElementById('formSection');
+        const previewSection = document.getElementById('previewSection');
+
+        function toggleAccordion(sectionName) {
+            const section = document.querySelector(\\\`[data-section="\\\${sectionName}"]\\\`);
+            const content = document.getElementById(\\\`\\\${sectionName}_content\\\`);
+            const toggle = section.querySelector('.accordion-toggle');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                content.classList.add('collapsed');
+                toggle.classList.remove('active');
+            } else {
+                content.classList.remove('collapsed');
+                content.classList.add('expanded');
+                toggle.classList.add('active');
+            }
+        }
+
+        function captureFormData() {
+            const formData = {};
+            const inputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.checked) {
+                        formData[input.name] = input.value;
+                    }
+                } else if (input.type === 'checkbox') {
+                    formData[input.name] = input.checked ? 'Yes' : 'No';
+                } else {
+                    formData[input.name] = input.value || '';
+                }
+            });
+            return formData;
+        }
+
+        function displayFormPreview(formData) {
+            const fileContent = document.getElementById('fileContent');
+            if (!fileContent) return;
+            
+            fileContent.innerHTML = \\\`
+                ${previewSections}
+            \\\`;
+        }
+
+        function showPreviewSection() {
+            if (previewSection && formSection) {
+                previewSection.classList.remove('hidden');
+                formSection.classList.add('compact');
+            }
+        }
+
+        function updatePreviewField(fieldId, value) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.textContent = value || 'Not provided';
+            }
+        }
+
+        function updateLivePreview() {
+            const previewSection = document.getElementById('previewSection');
+            if (previewSection.classList.contains('hidden')) return;
+            
+            const formData = captureFormData();
+            ${updatePreviewFields}
+        }
+
+        function clearForm() {
+            const allInputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            allInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.getAttribute('checked') !== null) {
+                        input.checked = true;
+                    } else {
+                        input.checked = false;
+                    }
+                } else if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else if (input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || input.type === 'password' || input.type === 'date') {
+                    input.value = '';
+                } else if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else if (input.tagName === 'TEXTAREA') {
+                    input.value = '';
+                }
+            });
+            updateLivePreview();
+            alert('Form cleared successfully!');
+        }
+
+        function closePreview() {
+            if (previewSection) {
+                previewSection.classList.add('hidden');
+            }
+            if (formSection) {
+                formSection.classList.remove('compact');
+            }
+        }
+
+        if (previewBtn) {
+            previewBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formData = captureFormData();
+                displayFormPreview(formData);
+                showPreviewSection();
+                updateLivePreview();
+            });
+        }
+
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formData = captureFormData();
+                alert('Form submitted successfully!\\\\n\\\\nData:\\\\n' + JSON.stringify(formData, null, 2));
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearForm();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const allFormInputs = document.querySelectorAll('#formSection input, #formSection select, #formSection textarea');
+            allFormInputs.forEach(input => {
+                input.addEventListener('input', updateLivePreview);
+                input.addEventListener('change', updateLivePreview);
+            });
+            
+            // Initialize first accordion as expanded
+            const firstToggle = document.querySelector('[data-section="accordion_0"] .accordion-toggle');
+            if (firstToggle) {
+                firstToggle.classList.add('active');
+            }
+        });`;
+        }
+
+        // Build Stepper Form
+        function buildStepperForm(config) {
+            // Generate stepper items
+            let stepperItemsHTML = '';
+            let stepTemplatesHTML = '';
+            
+            config.steps.forEach((step, stepIndex) => {
+                stepperItemsHTML += `
+                    <div class="stepper-item${stepIndex === 0 ? ' active' : ''}" data-step="${stepIndex + 1}">
+                        <div class="stepper-circle">${stepIndex + 1}</div>
+                        <div class="stepper-label">${step.label}</div>
+                    </div>
+                    ${stepIndex < config.steps.length - 1 ? '<div class="stepper-line"></div>' : ''}
+                `;
+                
+                const fieldsHTML = step.fields.map(field => generateFieldHTML(field)).join('\\n                                    ');
+                
+                stepTemplatesHTML += `
+                const step${stepIndex + 1}Template = \\\`
+                    <div class="form-container">
+                        <div id="formSection${stepIndex + 1}" class="form-section bg-white rounded-lg shadow-sm p-2 overflow-hidden compact-form">
+                            <div class="grid grid-cols-5 gap-2 mb-3">
+                                ${fieldsHTML}
+                            </div>
+                            
+                            <div class="action-buttons">
+                                ${stepIndex > 0 ? '<button class="action-btn action-btn-secondary" onclick="loadStep(' + stepIndex + ')">Previous</button>' : ''}
+                                ${stepIndex < config.steps.length - 1 ? '<button class="action-btn action-btn-primary" onclick="loadStep(' + (stepIndex + 2) + ')">Next</button>' : ''}
+                                <button class="action-btn action-btn-success" id="submitBtn${stepIndex + 1}">Submit</button>
+                                <button class="action-btn action-btn-warning" id="clearBtn${stepIndex + 1}">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                \\\`;
+                `;
+            });
+            
+            const cssContent = getSharedCSS() + getStepperCSS();
+            const jsContent = getStepperFormJS(config);
+            
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Stepper Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+${cssContent.replace(/`/g, '\\`')}
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="flex flex-col min-h-screen">
+        <div class="main-content-wrapper">
+            <div class="main-content-area bg-gray-50 p-6" style="width: 100%;">
+                <div class="max-w-full mx-auto">
+                    <div id="stepper" class="stepper-wrapper">
+                        ${stepperItemsHTML}
+                    </div>
+
+                    <div id="stepContent" class="fade-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+${jsContent}
+    </script>
+</body>
+</html>`;
+        }
+
+        // Get Stepper CSS
+        function getStepperCSS() {
+            return `
+.stepper-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+}
+
+.stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.stepper-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+
+.stepper-label {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stepper-line {
+  height: 2px;
+  background: #e5e7eb;
+  flex: 1;
+}
+
+.stepper-item.active .stepper-circle {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.stepper-item.completed .stepper-circle {
+  border-color: #10b981;
+  background: #10b981;
+  color: #fff;
+}
+
+.stepper-item.completed + .stepper-line {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.fade-container { position: relative; min-height: 300px; }
+.fade-in { animation: fadeIn 250ms ease-in-out; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}`;
+        }
+
+        // Get Stepper Form JavaScript
+        function getStepperFormJS(config) {
+            let stepTemplates = '';
+            
+            config.steps.forEach((step, stepIndex) => {
+                const fieldsHTML = step.fields.map(field => generateFieldHTML(field)).join('\\n                                    ');
+                
+                const prevButton = stepIndex > 0 ? `<button class="action-btn action-btn-secondary" onclick="loadStep(${stepIndex})">Previous</button>` : '';
+                const nextButton = stepIndex < config.steps.length - 1 ? `<button class="action-btn action-btn-primary" onclick="loadStep(${stepIndex + 2})">Next</button>` : '';
+                
+                stepTemplates += `
+                const step${stepIndex + 1}Template = \\\`
+                    <div class="form-container">
+                        <div id="formSection${stepIndex + 1}" class="form-section bg-white rounded-lg shadow-sm p-2 overflow-hidden compact-form">
+                            <div class="grid grid-cols-5 gap-2 mb-3">
+                                ${fieldsHTML}
+                            </div>
+                            
+                            <div class="action-buttons">
+                                ${prevButton}
+                                ${nextButton}
+                                <button class="action-btn action-btn-success" id="submitBtn${stepIndex + 1}">Submit</button>
+                                <button class="action-btn action-btn-warning" id="clearBtn${stepIndex + 1}">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                \\\`;
+                `;
+            });
+            
+            const initFunctions = config.steps.map((step, idx) => `
+                function initStep${idx + 1}(host) {
+                    const submitBtn = host.querySelector('#submitBtn${idx + 1}');
+                    const clearBtn = host.querySelector('#clearBtn${idx + 1}');
+                    
+                    if (submitBtn) {
+                        submitBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const formData = captureFormData(host);
+                            alert('Form submitted successfully!\\\\n\\\\n' + JSON.stringify(formData, null, 2));
+                        });
+                    }
+                    
+                    if (clearBtn) {
+                        clearBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            clearForm(host);
+                        });
+                    }
+                }
+            `).join('\\n');
+            
+            const loadStepCases = config.steps.map((step, idx) => `
+                    } else if (step === ${idx + 1}) {
+                        contentHost.innerHTML = step${idx + 1}Template;
+                        contentHost.classList.add('fade-in');
+                        setTimeout(() => contentHost.classList.remove('fade-in'), 260);
+                        initStep${idx + 1}(contentHost);
+            `).join('');
+            
+            return `${stepTemplates}
+
+        function loadStep(step) {
+            const stepper = document.getElementById('stepper');
+            const items = stepper.querySelectorAll('.stepper-item');
+            const contentHost = document.getElementById('stepContent');
+
+            items.forEach((item, idx) => {
+                item.classList.remove('active');
+                item.classList.toggle('completed', idx + 1 < step);
+                if (idx + 1 === step) item.classList.add('active');
+            });
+
+            if (step === 1) {
+                contentHost.innerHTML = step1Template;
+                contentHost.classList.add('fade-in');
+                setTimeout(() => contentHost.classList.remove('fade-in'), 260);
+                initStep1(contentHost);${loadStepCases}
+            }
+        }
+
+        function captureFormData(host) {
+            const formData = {};
+            const inputs = host.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.checked) {
+                        formData[input.name] = input.value;
+                    }
+                } else if (input.type === 'checkbox') {
+                    formData[input.name] = input.checked ? 'Yes' : 'No';
+                } else {
+                    formData[input.name] = input.value || '';
+                }
+            });
+            return formData;
+        }
+
+        function clearForm(host) {
+            const allInputs = host.querySelectorAll('input, select, textarea');
+            allInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.getAttribute('checked') !== null) {
+                        input.checked = true;
+                    } else {
+                        input.checked = false;
+                    }
+                } else if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else if (['text','email','tel','number','password','date'].includes(input.type)) {
+                    input.value = '';
+                } else if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else if (input.tagName === 'TEXTAREA') {
+                    input.value = '';
+                }
+            });
+            alert('Form cleared successfully!');
+        }
+
+        ${initFunctions}
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const items = document.querySelectorAll('#stepper .stepper-item');
+            items.forEach((el) => el.addEventListener('click', () => loadStep(Number(el.getAttribute('data-step')))));
+            loadStep(1);
+        });`;
+        }
+
+    </script>
+</body>
+</html>
