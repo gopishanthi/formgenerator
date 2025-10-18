@@ -354,7 +354,7 @@
         function generateFieldConfig(index, prefix) {
             const fieldId = `${prefix}_field_${index}`;
             return `
-                <div class="field-config">
+                <div class="field-config" data-field-id="${fieldId}" id="${fieldId}_container">
                     <div class="flex justify-between items-center mb-3">
                         <h4 class="font-semibold text-gray-700">Field ${index + 1}</h4>
                         <button onclick="removeField('${fieldId}')" class="btn-danger text-xs">Remove</button>
@@ -437,7 +437,7 @@
 
         // Remove field
         function removeField(fieldId) {
-            const fieldElement = document.getElementById(fieldId).closest('.field-config');
+            const fieldElement = document.querySelector(`.field-config[data-field-id="${fieldId}"]`);
             if (fieldElement) {
                 fieldElement.remove();
             }
@@ -464,8 +464,10 @@
             const container = document.getElementById('fieldsContainer');
             const fieldConfigs = container.querySelectorAll('.field-config');
             
-            fieldConfigs.forEach((fieldDiv, index) => {
-                const fieldId = `simple_field_${index}`;
+            fieldConfigs.forEach(fieldDiv => {
+                const fieldId = fieldDiv.dataset.fieldId;
+                if (!fieldId) return;
+
                 const label = document.getElementById(`${fieldId}_label`)?.value || '';
                 const name = document.getElementById(`${fieldId}_name`)?.value || '';
                 const type = document.getElementById(`${fieldId}_type`)?.value || 'text';
@@ -499,8 +501,10 @@
                 const container = document.getElementById(`accordion_${i}_fields`);
                 const fieldConfigs = container.querySelectorAll('.field-config');
                 
-                fieldConfigs.forEach((fieldDiv, fieldIndex) => {
-                    const fieldId = `accordion_${i}_field_${fieldIndex}`;
+                fieldConfigs.forEach(fieldDiv => {
+                    const fieldId = fieldDiv.dataset.fieldId;
+                    if (!fieldId) return;
+
                     const label = document.getElementById(`${fieldId}_label`)?.value || '';
                     const name = document.getElementById(`${fieldId}_name`)?.value || '';
                     const type = document.getElementById(`${fieldId}_type`)?.value || 'text';
@@ -537,8 +541,10 @@
                 const container = document.getElementById(`step_${i}_fields`);
                 const fieldConfigs = container.querySelectorAll('.field-config');
                 
-                fieldConfigs.forEach((fieldDiv, fieldIndex) => {
-                    const fieldId = `step_${i}_field_${fieldIndex}`;
+                fieldConfigs.forEach(fieldDiv => {
+                    const fieldId = fieldDiv.dataset.fieldId;
+                    if (!fieldId) return;
+
                     const fieldLabel = document.getElementById(`${fieldId}_label`)?.value || '';
                     const name = document.getElementById(`${fieldId}_name`)?.value || '';
                     const type = document.getElementById(`${fieldId}_type`)?.value || 'text';
